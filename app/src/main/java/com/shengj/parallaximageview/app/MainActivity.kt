@@ -33,7 +33,9 @@ class MainActivity : AppCompatActivity(), GravitySensor.GravityListener {
     }
 
     override fun onGravityChange(x: Float, y: Float) {
+        // x, y参数传入表示晃动方向跟重力方向一致
         binding.image1.onGravityChange(x, y)
+        // -x, -y参数传入表示晃动方向跟重力方向相反
         binding.image3.onGravityChange(-x, -y)
     }
 
