@@ -16,10 +16,7 @@
     android:id="@+id/image1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:scale="1.25"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    app:scale="1.25"/>
 ```
 
 ### 步骤二：
