@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="GravityImageView">
+        <attr name="scale" format="string" />
+    </declare-styleable>
+</resources>
