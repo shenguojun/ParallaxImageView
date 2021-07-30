@@ -8,6 +8,29 @@
 
 ## 引入
 
+### 步骤一：
+
+root目录中的 build.gradle 加入 jitpack repositories:
+
+```groovy
+allprojects {
+  repositories {
+    ...
+      maven { url 'https://jitpack.io' }
+  }
+}
+```
+
+### 步骤二：
+
+添加 dependency
+
+```groovy
+dependencies {
+  implementation 'com.github.shenguojun:ParallaxImageView:Tag'
+}
+```
+
 ## 使用
 
 ### 步骤一：
