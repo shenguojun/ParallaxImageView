@@ -4,6 +4,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.shengj.repo</groupId>
   <artifactId>parallax-image-view</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.5</version>
   <packaging>aar</packaging>
 </project>

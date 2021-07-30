@@ -37,7 +37,7 @@ ext {
     GITHUB_REPO_PATH = "file://${rootDir}/repo"
     PUBLISH_GROUP_ID = 'com.shengj.repo'
     PUBLISH_ARTIFACT_ID = 'parallax-image-view'
-    PUBLISH_VERSION = '0.0.2'
+    PUBLISH_VERSION = '0.0.5'
 }
 
 task sourcesJar(type: Jar) {
