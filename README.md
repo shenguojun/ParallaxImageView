@@ -58,7 +58,7 @@ lifecycle.addObserver(GravitySensor(this).also {
 
 ### 步骤三：
 
-将传感器的回调直接设置给`GravityImageView`，其中`x, y`是表示跟重力方向一致，`-x, -y`表示跟重力方向方法
+将传感器的回调直接设置给`GravityImageView`，其中`x, y`是表示跟重力方向一致，`-x, -y`表示跟重力方向相反
 
 ```kotlin
 override fun onGravityChange(x: Float, y: Float) {
