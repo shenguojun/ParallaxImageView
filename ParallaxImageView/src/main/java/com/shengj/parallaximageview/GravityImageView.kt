@@ -41,8 +41,8 @@ class GravityImageView @JvmOverloads constructor(
         val attr = context.obtainStyledAttributes(
             attrs, R.styleable.GravityImageView, defStyleAttr, 0
         )
-        _scale = attr.getString(R.styleable.GravityImageView_scale)?.toFloat() ?: scale
-        if (scale < 1) {
+        _scale = attr.getString(R.styleable.GravityImageView_scale)?.toFloat() ?: 1f
+        if (_scale < 1) {
             throw RuntimeException("GravityImageView's scale must not less then 1")
         }
         attr.recycle()
