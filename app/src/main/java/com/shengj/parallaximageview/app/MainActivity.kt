@@ -14,15 +14,15 @@ class MainActivity : AppCompatActivity(), GravitySensor.GravityListener {
         setContentView(binding.root)
         Glide.with(binding.image1)
             .load(R.drawable.image1)
-            .centerInside()
+            .fitCenter()
             .into(binding.image1)
         Glide.with(binding.image2)
             .load(R.drawable.image2)
-            .centerInside()
+            .fitCenter()
             .into(binding.image2)
         Glide.with(binding.image3)
             .load(R.drawable.image3)
-            .centerInside()
+            .fitCenter()
             .into(binding.image3)
 
         // 注册声明周期以及传感器回调
@@ -34,9 +34,9 @@ class MainActivity : AppCompatActivity(), GravitySensor.GravityListener {
 
     override fun onGravityChange(x: Float, y: Float) {
         // x, y参数传入表示晃动方向跟重力方向一致
-        binding.image1.onGravityChange(x, y)
+        binding.image3.onGravityChange(x, y)
         // -x, -y参数传入表示晃动方向跟重力方向相反
-        binding.image3.onGravityChange(-x, -y)
+        binding.image1.onGravityChange(-x, -y)
     }
 
 }
