@@ -18,18 +18,23 @@ class GravityImageView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr), GravitySensor.GravityListener {
     private var originMatrix: Matrix? = null
+    private val onPreDrawListener = SizeOnPreDrawListener()
     private var originXOffset = 0f
     private var originYOffset = 0f
     private var _scale: Float = 1f
     private var hasDraw = false
 
     /**
-     * 设置放大倍数
+     * 设置放大倍数，需要调用[onGravityChange]方法才会生效
      */
     var scale: Float
         get() = _scale
         set(value) {
+            if (value < 1) {
+                throw RuntimeException("GravityImageView's scale must not less then 1")
+            }
             _scale = value
+            onPreDrawListener.onPreDraw()
         }
 
     init {
@@ -42,7 +47,7 @@ class GravityImageView @JvmOverloads constructor(
         }
         attr.recycle()
         scaleType = ScaleType.MATRIX
-        viewTreeObserver.addOnPreDrawListener(SizeOnPreDrawListener())
+        viewTreeObserver.addOnPreDrawListener(onPreDrawListener)
     }
 
     inner class SizeOnPreDrawListener : ViewTreeObserver.OnPreDrawListener {
@@ -52,7 +57,7 @@ class GravityImageView @JvmOverloads constructor(
                 // 由于图片经过放大了Scale倍数，为了居中需要移动一下
                 originXOffset = measuredWidth * (scale - 1) / 2
                 originYOffset = measuredHeight * (scale - 1) / 2
-                originMatrix = imageMatrix.also {
+                originMatrix = Matrix().also {
                     // 因为当重力变化时需要放大，因此这里先缩小一下
                     it.postTranslate(-originXOffset / scale, -originYOffset / scale)
                 }
