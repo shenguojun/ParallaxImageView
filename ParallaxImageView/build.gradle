@@ -42,7 +42,7 @@ ext {
 
 task sourcesJar(type: Jar) {
     classifier 'sources'
-    from "${rootDir}/src/main/java"
+    from android.sourceSets.main.java.srcDirs
 }
 
 task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
@@ -62,8 +62,8 @@ afterEvaluate {
                 groupId = project.PUBLISH_GROUP_ID
                 artifactId = project.PUBLISH_ARTIFACT_ID
                 version = project.PUBLISH_VERSION
-                artifact javadocJar
                 artifact sourcesJar
+                artifact javadocJar
                 artifact bundleReleaseAar
             }
         }
