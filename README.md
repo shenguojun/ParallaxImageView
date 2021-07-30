@@ -23,11 +23,11 @@ allprojects {
 
 ### 步骤二：
 
-添加 dependency
+添加 dependency，最新版本[![](https://jitpack.io/v/shenguojun/ParallaxImageView.svg)](https://jitpack.io/#shenguojun/ParallaxImageView)
 
 ```groovy
 dependencies {
-  implementation 'com.github.shenguojun:ParallaxImageView:Tag'
+  implementation 'com.github.shenguojun:ParallaxImageView:$latestVersion'
 }
 ```
 
