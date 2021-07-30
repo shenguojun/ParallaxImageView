@@ -1,5 +1,6 @@
 # ParallaxImageView
 
+[![](https://jitpack.io/v/shenguojun/ParallaxImageView.svg)](https://jitpack.io/#shenguojun/ParallaxImageView)
 
 跟随重力感应的视差3D效果ImageView，效果图如下：
 
