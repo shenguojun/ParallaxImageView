@@ -80,7 +80,7 @@ class GravitySensor(private val context: Context) : DefaultLifecycleObserver, Se
 
     interface GravityListener {
         /**
-         * 根据重力返回重力偏移，一个单位重力加速度[G]数值为9.80665f
+         * 根据重力返回重力偏移，一个单位重力加速度[G]数值为9.80665f，
          * 每[REFRESH_RATE]毫秒会调用一次，注意不要调用耗时任务
          *
          * @param x 左右角度变化，手机左边朝下为-[G]，右边朝下为[G]，平放为0

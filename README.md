@@ -1,4 +1,6 @@
 # ParallaxImageView
+
+
 跟随重力感应的视差3D效果ImageView，效果图如下：
 
 ![demo](material/demo.gif)
