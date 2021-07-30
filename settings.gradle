@@ -7,4 +7,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ParallaxImageView"
 include ':app'
-include ':ParallaxImageView'
+include ':library'
