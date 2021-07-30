@@ -50,10 +50,11 @@ class GravityImageView @JvmOverloads constructor(
             if (measuredWidth != 0 && measuredHeight != 0) {
                 viewTreeObserver.removeOnPreDrawListener(this)
                 // 由于图片经过放大了Scale倍数，为了居中需要移动一下
-                originXOffset = measuredWidth * (scale - 1) / 2 / scale
-                originYOffset = measuredHeight * (scale - 1) / 2 / scale
+                originXOffset = measuredWidth * (scale - 1) / 2
+                originYOffset = measuredHeight * (scale - 1) / 2
                 originMatrix = imageMatrix.also {
-                    it.postTranslate(-originXOffset, -originYOffset)
+                    // 因为当重力变化时需要放大，因此这里先缩小一下
+                    it.postTranslate(-originXOffset / scale, -originYOffset / scale)
                 }
                 hasDraw = true
             }
@@ -69,8 +70,8 @@ class GravityImageView @JvmOverloads constructor(
             postScale(scale, scale)
             // 根据最大偏移算出当前偏移
             postTranslate(
-                x * originXOffset * scale / GravitySensor.G,
-                y * originYOffset * scale / GravitySensor.G
+                x * originXOffset / GravitySensor.G,
+                y * originYOffset / GravitySensor.G
             )
         }.also {
             imageMatrix = it
