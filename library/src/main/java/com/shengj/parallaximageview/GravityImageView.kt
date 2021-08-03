@@ -108,7 +108,7 @@ class GravityImageView @JvmOverloads constructor(
 
     private fun configureBounds() {
         if (drawable == null || hasConfig || width == 0 || height == 0) return
-        var drawMatrix = Matrix()
+        val drawMatrix: Matrix
         val dWidth = drawable.intrinsicWidth
         val dHeight = drawable.intrinsicHeight
         val vWidth = width - paddingLeft - paddingRight
