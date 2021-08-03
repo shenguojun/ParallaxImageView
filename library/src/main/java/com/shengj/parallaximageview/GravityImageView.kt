@@ -187,8 +187,9 @@ class GravityImageView @JvmOverloads constructor(
         originXOffset = vWidth * (scale - 1) / 2
         originYOffset = vHeight * (scale - 1) / 2
         originMatrix = drawMatrix
-        // 因为当重力变化时需要放大，因此这里先缩小一下
-        originMatrix?.postTranslate(-originXOffset / scale, -originYOffset / scale)
+        originMatrix?.postScale(scale, scale)
+        originMatrix?.postTranslate(-originXOffset, -originYOffset)
+        imageMatrix = originMatrix
         hasConfig = true
     }
 
@@ -197,7 +198,6 @@ class GravityImageView @JvmOverloads constructor(
         if (!hasConfig) return
         matrix.apply {
             set(originMatrix)
-            postScale(scale, scale)
             // 根据最大偏移算出当前偏移
             postTranslate(
                 x * originXOffset / GravitySensor.G,
