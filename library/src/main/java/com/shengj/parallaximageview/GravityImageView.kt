@@ -1,9 +1,11 @@
 package com.shengj.parallaximageview
 
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Matrix
+import android.graphics.Matrix.ScaleToFit
+import android.graphics.RectF
 import android.util.AttributeSet
-import android.view.ViewTreeObserver
 import androidx.appcompat.widget.AppCompatImageView
 
 /**
@@ -18,14 +20,53 @@ class GravityImageView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr), GravitySensor.GravityListener {
     private var originMatrix: Matrix? = null
-    private val onPreDrawListener = SizeOnPreDrawListener()
     private var originXOffset = 0f
     private var originYOffset = 0f
     private var _scale: Float = 1f
-    private var hasDraw = false
+    private var mScaleType: ScaleType = ScaleType.FIT_CENTER
+    private var hasConfig = false
+
+    companion object {
+        private val sScaleTypeArray = arrayOf(
+            ScaleType.MATRIX,
+            ScaleType.FIT_XY,
+            ScaleType.FIT_START,
+            ScaleType.FIT_CENTER,
+            ScaleType.FIT_END,
+            ScaleType.CENTER,
+            ScaleType.CENTER_CROP,
+            ScaleType.CENTER_INSIDE
+        )
+
+        private fun scaleTypeToScaleToFit(st: ScaleType): ScaleToFit {
+            return when (st) {
+                ScaleType.FIT_XY -> ScaleToFit.FILL
+                ScaleType.FIT_START -> ScaleToFit.START
+                ScaleType.FIT_CENTER -> ScaleToFit.CENTER
+                ScaleType.FIT_END -> ScaleToFit.END
+                else -> ScaleToFit.FILL
+            }
+        }
+    }
+
+    override fun setScaleType(scaleType: ScaleType?) {
+        if (scaleType == null) {
+            throw NullPointerException()
+        }
+        if (mScaleType != scaleType) {
+            mScaleType = scaleType
+            hasConfig = false
+            requestLayout()
+            invalidate()
+        }
+    }
+
+    override fun getScaleType(): ScaleType {
+        return mScaleType
+    }
 
     /**
-     * 设置放大倍数，需要调用[onGravityChange]方法才会生效
+     * 设置放大倍数
      */
     var scale: Float
         get() = _scale
@@ -34,7 +75,10 @@ class GravityImageView @JvmOverloads constructor(
                 throw RuntimeException("GravityImageView's scale must not less then 1")
             }
             _scale = value
-            onPreDrawListener.onPreDraw()
+            hasConfig = false
+            requestLayout()
+            invalidate()
+            onGravityChange(0f, 0f)
         }
 
     init {
@@ -45,31 +89,108 @@ class GravityImageView @JvmOverloads constructor(
         if (_scale < 1) {
             throw RuntimeException("GravityImageView's scale must not less then 1")
         }
+        val index: Int = attr.getInt(R.styleable.GravityImageView_gScaleType, -1)
+        if (index >= 0) {
+            mScaleType = sScaleTypeArray[index]
+        }
         attr.recycle()
-        scaleType = ScaleType.MATRIX
-        viewTreeObserver.addOnPreDrawListener(onPreDrawListener)
+        if (isInEditMode) {
+            super.setScaleType(mScaleType)
+        } else {
+            super.setScaleType(ScaleType.MATRIX)
+        }
     }
 
-    inner class SizeOnPreDrawListener : ViewTreeObserver.OnPreDrawListener {
-        override fun onPreDraw(): Boolean {
-            if (measuredWidth != 0 && measuredHeight != 0) {
-                viewTreeObserver.removeOnPreDrawListener(this)
-                // 由于图片经过放大了Scale倍数，为了居中需要移动一下
-                originXOffset = measuredWidth * (scale - 1) / 2
-                originYOffset = measuredHeight * (scale - 1) / 2
-                originMatrix = Matrix().also {
-                    // 因为当重力变化时需要放大，因此这里先缩小一下
-                    it.postTranslate(-originXOffset / scale, -originYOffset / scale)
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+        configureBounds()
+    }
+
+    private fun configureBounds() {
+        if (drawable == null || hasConfig || width == 0 || height == 0) return
+        var drawMatrix = Matrix()
+        val dWidth = drawable.intrinsicWidth
+        val dHeight = drawable.intrinsicHeight
+        val vWidth = width - paddingLeft - paddingRight
+        val vHeight = height - paddingTop - paddingBottom
+
+        val fits = ((dWidth < 0 || vWidth == dWidth)
+                && (dHeight < 0 || vHeight == dHeight))
+        if (dWidth <= 0 || dHeight <= 0 || ScaleType.FIT_XY == mScaleType) {
+            drawable.setBounds(0, 0, vWidth, vHeight)
+        } else {
+            drawable.setBounds(0, 0, dWidth, dHeight)
+            when {
+                ScaleType.MATRIX == mScaleType -> {
+                    drawMatrix = if (matrix.isIdentity) {
+                        Matrix()
+                    } else {
+                        matrix
+                    }
                 }
-                hasDraw = true
+                fits -> {
+                    drawMatrix = Matrix()
+                }
+                ScaleType.CENTER == mScaleType -> {
+                    drawMatrix = Matrix()
+                    drawMatrix.postTranslate((vWidth - dWidth) * 0.5f, (vHeight - dHeight) * 0.5f)
+                }
+                ScaleType.CENTER_CROP == mScaleType -> {
+                    drawMatrix = Matrix()
+                    val scale: Float
+                    var dx = 0f
+                    var dy = 0f
+                    if (dWidth * vHeight > vWidth * dHeight) {
+                        scale = vHeight.toFloat() / dHeight.toFloat()
+                        dx = (vWidth - dWidth * scale) * 0.5f
+                    } else {
+                        scale = vWidth.toFloat() / dWidth.toFloat()
+                        dy = (vHeight - dHeight * scale) * 0.5f
+                    }
+                    drawMatrix.postScale(scale, scale)
+                    drawMatrix.postTranslate(dx, dy)
+                }
+                ScaleType.CENTER_INSIDE == mScaleType -> {
+                    drawMatrix = Matrix()
+                    val dx: Float
+                    val dy: Float
+                    val scale: Float = if (dWidth <= vWidth && dHeight <= vHeight) {
+                        1.0f
+                    } else {
+                        (vWidth.toFloat() / dWidth.toFloat()).coerceAtMost(vHeight.toFloat() / dHeight.toFloat())
+                    }
+                    dx = (vWidth - dWidth * scale) * 0.5f
+                    dy = (vHeight - dHeight * scale) * 0.5f
+                    drawMatrix.postScale(scale, scale)
+                    drawMatrix.postTranslate(dx, dy)
+                }
+                else -> {
+                    val temp = RectF()
+                    val tempDst = RectF()
+                    // Generate the required transform.
+                    temp.set(0f, 0f, dWidth.toFloat(), dHeight.toFloat())
+                    tempDst.set(0f, 0f, vWidth.toFloat(), vHeight.toFloat())
+                    drawMatrix = Matrix()
+                    drawMatrix.setRectToRect(
+                        temp,
+                        tempDst,
+                        scaleTypeToScaleToFit(mScaleType)
+                    )
+                }
             }
-            return true
         }
+        // 由于图片经过放大了Scale倍数，为了居中需要移动一下
+        originXOffset = vWidth * (scale - 1) / 2
+        originYOffset = vHeight * (scale - 1) / 2
+        originMatrix = drawMatrix
+        // 因为当重力变化时需要放大，因此这里先缩小一下
+        originMatrix?.postTranslate(-originXOffset / scale, -originYOffset / scale)
+        hasConfig = true
     }
 
 
     override fun onGravityChange(x: Float, y: Float) {
-        if (!hasDraw) return
+        if (!hasConfig) return
         matrix.apply {
             set(originMatrix)
             postScale(scale, scale)
