@@ -116,6 +116,7 @@ class GravityImageView @JvmOverloads constructor(
 
         val fits = ((dWidth < 0 || vWidth == dWidth)
                 && (dHeight < 0 || vHeight == dHeight))
+        // 根据不同缩放类型进行缩放
         if (dWidth <= 0 || dHeight <= 0 || ScaleType.FIT_XY == mScaleType) {
             drawable.setBounds(0, 0, vWidth, vHeight)
             drawMatrix = Matrix()
@@ -171,7 +172,6 @@ class GravityImageView @JvmOverloads constructor(
                 else -> {
                     val temp = RectF()
                     val tempDst = RectF()
-                    // Generate the required transform.
                     temp.set(0f, 0f, dWidth.toFloat(), dHeight.toFloat())
                     tempDst.set(0f, 0f, vWidth.toFloat(), vHeight.toFloat())
                     drawMatrix = Matrix()
