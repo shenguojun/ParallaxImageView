@@ -118,6 +118,10 @@ class GravityImageView @JvmOverloads constructor(
                 && (dHeight < 0 || vHeight == dHeight))
         if (dWidth <= 0 || dHeight <= 0 || ScaleType.FIT_XY == mScaleType) {
             drawable.setBounds(0, 0, vWidth, vHeight)
+            drawMatrix = Matrix()
+            val scaleY = vHeight.toFloat() / dHeight.toFloat()
+            val scaleX = vWidth.toFloat() / dWidth.toFloat()
+            drawMatrix.postScale(scaleX, scaleY)
         } else {
             drawable.setBounds(0, 0, dWidth, dHeight)
             when {
